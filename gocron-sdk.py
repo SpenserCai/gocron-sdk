@@ -4,13 +4,15 @@ import requests
 class GoCron:
     @staticmethod
     def CreateToken():
-        authSecret = "[AUTH_SECRET]"
+        authSecret = "auth_secret"
+        apiBaseUrl = "base_url"
+        apiUser = "user_name"
+        apiUserId = int("user_id")
         jwtHeaders = headers = {"alg": "HS256","typ": "JWT"}
-        apiBaseUrl = "http://127.0.0.1:5920"
         payload = {
-            'uid': 1,
+            'uid': apiUserId,
             'issuer': 'gocron',
-            'username': '[YOUR_USER_NAME]',
+            'username': apiUser,
             'is_admin': 1,
             "iat":int(time.time()),
             "exp": int(time.time()+60)
@@ -49,3 +51,21 @@ class GoCron:
         page = query.get("page","")
         urlPath = '/api/task?page_size={0}&page={1}&id={2}&protocol={3}&name={4}&tag={5}&host_id={6}&status={7}'.format(pageSize,page,taskId,taskProtocol,taskName,taskTag,hostId,taskStatus)
         return GoCron.SendResquest(urlPath)
+
+    @staticmethod
+    def GetLogListQuery(query):
+        taskId = query.get("id","")
+        taskProtocol = query.get("protocol","")
+        taskStatus = query.get("status","")
+        pageSize = query.get("page_size","")
+        page = query.get("page","")
+        urlPath = '/api/task/log?page_size={0}&page={1}&task_id={2}&protocol={3}&status={4}'.format(pageSize,page,taskId,taskProtocol,taskStatus)
+        return GoCron.SendResquest(urlPath)
+
+    @staticmethod
+    def RunTaskWithTaskId(taskId):
+        return GoCron.SendResquest('/api/task/run/{0}'.format(taskId))
+
+    @staticmethod
+    def RemoveTaskWithTaskId(taskId):
+        return GoCron.SendResquest('/api/task/remove/{0}'.format(taskId))
